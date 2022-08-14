@@ -24,10 +24,10 @@ namespace HeyUrlChallengeCodeDotnet
             services.AddBrowserDetection();
             services.AddControllersWithViews();
 
-            //services.AddDbContext<ApplicationContext>(options => options.UseInMemoryDatabase(databaseName: "HeyUrl"));
+            services.AddDbContext<ApplicationContext>(options => options.UseInMemoryDatabase(databaseName: "HeyUrl"));
 
-            var connectionString = Configuration.GetConnectionString("DefaultConnection");
-            services.AddDbContext<ApplicationContext>(options => options.UseSqlServer(connectionString));
+            //var connectionString = Configuration.GetConnectionString("DefaultConnection");
+            //services.AddDbContext<ApplicationContext>(options => options.UseSqlServer(connectionString));
 
             services.AddTransient<ShortenerService>();
         }
