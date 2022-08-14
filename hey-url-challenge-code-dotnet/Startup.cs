@@ -28,8 +28,8 @@ namespace HeyUrlChallengeCodeDotnet
 
             var connectionString = Configuration.GetConnectionString("DefaultConnection");
             services.AddDbContext<ApplicationContext>(options => options.UseSqlServer(connectionString));
-            services.AddTransient<ShortenerService>();
 
+            services.AddTransient<ShortenerService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

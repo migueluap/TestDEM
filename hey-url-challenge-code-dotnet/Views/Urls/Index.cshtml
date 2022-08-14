@@ -51,8 +51,8 @@
         @foreach (var url in Model.Urls)
         {
             <tr>
-                <th scope="row"><a href="@url.OriginalUrl.ToString()">@Model.BaseUrl@url.ShortUrl</a></th>
-                <td><a href="@url.OriginalUrl">@url.OriginalUrl</a></td>
+                <th scope="row"><a href="@url.OriginalUrl.ToString()" target="_blank" rel="noopener noreferrer">@Model.BaseUrl@url.ShortUrl</a></th>
+                <td><a href="@url.OriginalUrl" target="_blank" rel="noopener noreferrer">@url.OriginalUrl</a></td>
                 <td>@url.CreatedAt.ToString("MMMM dd, yyyy")</td>
                 <td>@url.Count</td>
                 <td>

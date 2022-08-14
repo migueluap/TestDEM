@@ -8,6 +8,7 @@ using hey_url_challenge_code_dotnet.ViewModels;
 using HeyUrlChallengeCodeDotnet.Data;
 using HeyUrlChallengeCodeDotnet.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Shyjus.BrowserDetection;
 
@@ -50,7 +51,7 @@ namespace HeyUrlChallengeCodeDotnet.Controllers
                 //Update URLs
                 urlDB.Count++;
                 db.Urls.Update(urlDB);
-                db.SaveChangesAsync();
+                db.SaveChanges();
 
                 //Insert Click Information
                 var newClick = new Click() {
@@ -61,48 +62,83 @@ namespace HeyUrlChallengeCodeDotnet.Controllers
 
                 db.Clicks.Add(newClick);
                 db.SaveChanges();
+                Redirect(url);
+                return Ok();
 
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                throw;
+                return BadRequest(ex);
+                //return StatusCode(500, new ErrorViewModel("RequesID", Message.ERRO_INTERNAL_SERVER_FAILURE));
             }
-            Redirect(url);
-            return Ok();
+
          }
 
         [Route("urls/{url}")]
-        public IActionResult Show(string url) => View(new ShowViewModel
+        public IActionResult Show(string url
+            , [FromServices] ApplicationContext db)
         {
-            Url = new Url {ShortUrl = url, Count = getrandom.Next(1, 10)},
-            DailyClicks = new Dictionary<string, int>
-            {
-                {"1", 13},
-                {"2", 2},
-                {"3", 1},
-                {"4", 7},
-                {"5", 20},
-                {"6", 18},
-                {"7", 10},
-                {"8", 20},
-                {"9", 15},
-                {"10", 5}
-            },
-            BrowseClicks = new Dictionary<string, int>
-            {
-                { "IE", 13 },
-                { "Firefox", 22 },
-                { "Chrome", 17 },
-                { "Safari", 7 },
-            },
-            PlatformClicks = new Dictionary<string, int>
-            {
-                { "Windows", 13 },
-                { "macOS", 22 },
-                { "Ubuntu", 17 },
-                { "Other", 7 },
-            }
-        });
+            var urlDB = db.Urls
+                .Include(u => u.Clicks)
+                .SingleOrDefault(u => u.ShortUrl == url);
+
+            if (urlDB == null) return NotFound();
+
+            ShowViewModel showViewModel = new ShowViewModel();
+
+            showViewModel.Url = urlDB;
+            showViewModel.DailyClicks = db.Clicks
+                            .Where(c => c.IdUrl == urlDB.Id)
+                            .GroupBy(c => c.CreateAt)
+                            .Select(g => new { CreateAt = g.Key, count = g.Count() })
+                            .ToDictionary(k => k.CreateAt.ToString("MMMM dd"), i => i.count);
+
+            showViewModel.BrowseClicks = db.Clicks
+                            .Where(c => c.IdUrl == urlDB.Id)
+                            .GroupBy(c => c.Browser)
+                            .Select(g => new { Browser = g.Key, count = g.Count() })
+                            .ToDictionary(k => k.Browser, i => i.count);
+
+            showViewModel.PlatformClicks = db.Clicks
+                            .Where(c => c.IdUrl == urlDB.Id)
+                            .GroupBy(c => c.OS)
+                            .Select(g => new { OS = g.Key, count = g.Count() })
+                            .ToDictionary(k => k.OS, i => i.count);
+
+            return View(showViewModel);
+
+            //return View(new ShowViewModel
+            //            {
+            //                        Url = new Url { ShortUrl = url, Count = getrandom.Next(1, 10) },
+            //                        DailyClicks = new Dictionary<string, int>
+            //                    {
+            //                        {"1", 13},
+            //                        {"2", 2},
+            //                        {"3", 1},
+            //                        {"4", 7},
+            //                        {"5", 20},
+            //                        {"6", 18},
+            //                        {"7", 10},
+            //                        {"8", 20},
+            //                        {"9", 15},
+            //                        {"10", 5}
+            //                    },
+            //                        BrowseClicks = new Dictionary<string, int>
+            //                    {
+            //                        { "IE", 13 },
+            //                        { "Firefox", 22 },
+            //                        { "Chrome", 17 },
+            //                        { "Safari", 7 },
+            //                    },
+            //                        PlatformClicks = new Dictionary<string, int>
+            //                    {
+            //                        { "Windows", 13 },
+            //                        { "macOS", 22 },
+            //                        { "Ubuntu", 17 },
+            //                        { "Other", 7 },
+            //                    }
+            //            });
+         }
 
         [HttpPost, Route("urls/get-short/{urlOriginal}")]
         public IActionResult GetShort(string urlOriginal
