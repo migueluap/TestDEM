@@ -21,7 +21,13 @@
             crossDomain: true,
             success: function (data) {
                 console.log(data);
-                window.location.href = "/urls/" + data.shortCodeGenerated
+
+                if (data.shortCodeGenerated === '0000') { 
+                    divResponseArea.show();
+                    return;
+                }
+
+               window.location.href = "/urls/" + data.shortCodeGenerated
             },
             error: function (errorMessage) {
                 console.log(XMLHttpRequest);

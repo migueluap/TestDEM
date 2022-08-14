@@ -5,6 +5,7 @@ namespace hey_url_challenge_code_dotnet.ViewModels
 {
     public class HomeViewModel
     {
+        public string BaseUrl{ get; set; }
         public IEnumerable<Url> Urls { get; set; }
         public Url NewUrl { get; set; }
     }

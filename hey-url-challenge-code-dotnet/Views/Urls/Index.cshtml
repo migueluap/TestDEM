@@ -51,9 +51,9 @@
         @foreach (var url in Model.Urls)
         {
             <tr>
-                <th scope="row"><a href="https://localhost:5001/ABCDE">https://localhost:5001/ABCDE</a></th>
-                <td><a href="https://drive.google.com/file/d/1VdLgSSMojWFb1GRoBAFX_eXy7oX2J">drive.google.com/file/d/1VdLgSS...</a></td>
-                <td><!-- Please match the same format -->Feb 24, 2021</td>
+                <th scope="row"><a href="@url.OriginalUrl.ToString()">@Model.BaseUrl@url.ShortUrl</a></th>
+                <td><a href="@url.OriginalUrl">@url.OriginalUrl</a></td>
+                <td>@url.CreatedAt.ToString("MMMM dd, yyyy")</td>
                 <td>@url.Count</td>
                 <td>
                     <a href=@string.Format("/urls/{0}", url.ShortUrl)>

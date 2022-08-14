@@ -26,33 +26,50 @@ namespace HeyUrlChallengeCodeDotnet.Controllers
             _logger = logger;
         }
 
-        public IActionResult Index()
+        public IActionResult Index([FromServices] ApplicationContext db)
         {
             var model = new HomeViewModel();
-            model.Urls = new List<Url>
-            {
-                new()
-                {
-                    ShortUrl = "ABCDE",
-                    Count = getrandom.Next(1, 10)
-                },
-                new()
-                {
-                    ShortUrl = "ABCDE",
-                    Count = getrandom.Next(1, 10)
-                },
-                new()
-                {
-                    ShortUrl = "ABCDE",
-                    Count = getrandom.Next(1, 10)
-                },
-            };
+            model.Urls = db.Urls.ToList();
+            model.BaseUrl = $"{HttpContext.Request.Scheme}://{HttpContext.Request.Host}/";
             model.NewUrl = new();
+
             return View(model);
         }
 
         [Route("/{url}")]
-        public IActionResult Visit(string url) => new OkObjectResult($"{url}, {this.browserDetector.Browser.OS}, {this.browserDetector.Browser.Name}");
+        public IActionResult Visit(string url
+            ,[FromServices] ApplicationContext db) {
+            //var aa = new OkObjectResult($"{url}, {this.browserDetector.Browser.OS}, {this.browserDetector.Browser.Name}");
+
+            try
+            {
+                var urlDB = db.Urls.FirstOrDefault(u => u.OriginalUrl == url);
+
+                if (urlDB == null) return NotFound();
+
+                //Update URLs
+                urlDB.Count++;
+                db.Urls.Update(urlDB);
+                db.SaveChangesAsync();
+
+                //Insert Click Information
+                var newClick = new Click() {
+                    IdUrl = urlDB.Id,
+                    OS = browserDetector.Browser.OS,
+                    Browser = browserDetector.Browser.Name
+                };
+
+                db.Clicks.Add(newClick);
+                db.SaveChanges();
+
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+            Redirect(url);
+            return Ok();
+         }
 
         [Route("urls/{url}")]
         public IActionResult Show(string url) => View(new ShowViewModel
@@ -98,17 +115,18 @@ namespace HeyUrlChallengeCodeDotnet.Controllers
             {
                 var urls = db.Urls.ToList();
 
-                if (urls.Exists(u => u.ShortUrl == shortCode))
+                if (urls.Exists(uo => uo.OriginalUrl == urlOriginal))
+                    return Ok(new { shortCodeGenerated = ShortCode.ALREADY_EXIST_0000 });
+
+                if (urls.Exists(us => us.ShortUrl == shortCode))
                     shortCode = shortenerServiceService.GenerateShortCode();
 
                 var newUrl = new Url() {
                     ShortUrl = shortCode,
                     OriginalUrl = urlOriginal,
-                    CreatedAt = DateTime.Now,
-                    Count = 0
                 };
 
-                db.Add(newUrl);
+                db.Urls.Add(newUrl);
                 db.SaveChanges();
 
                 return Ok(new

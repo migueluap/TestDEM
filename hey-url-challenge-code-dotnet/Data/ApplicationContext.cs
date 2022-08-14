@@ -11,10 +11,12 @@ namespace HeyUrlChallengeCodeDotnet.Data
         }
 
         public DbSet<Url> Urls { get; set; }
+        public DbSet<Click> Clicks { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.ApplyConfiguration(new UrlMap());
+            modelBuilder.ApplyConfiguration(new ClickMap());
         }
     }
 }

@@ -23,6 +23,7 @@ namespace HeyUrlChallengeCodeDotnet
         {
             services.AddBrowserDetection();
             services.AddControllersWithViews();
+
             //services.AddDbContext<ApplicationContext>(options => options.UseInMemoryDatabase(databaseName: "HeyUrl"));
 
             var connectionString = Configuration.GetConnectionString("DefaultConnection");

@@ -32,12 +32,15 @@ namespace hey_url_challenge_code_dotnet.Data.Mappings
                 .HasColumnType("VARCHAR")
                 .HasMaxLength(80);
 
-
-
             builder.Property(x => x.Count)
                 .IsRequired()
                 .HasColumnName("Count")
                 .HasColumnType("INT");
+
+            //Relationships
+            builder.HasMany(u => u.Clicks)
+                    .WithOne()
+                    .HasForeignKey(c => c.IdUrl);
         }
     }
 }
