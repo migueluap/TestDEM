@@ -2,8 +2,7 @@
 
 # HeyURL! Code Challenge
 
-This repository has been created as a code challenge for candidates with
-FullStack Labs. Please setup your environment following the `Getting Started`
+Challenge for FullStack Labs. Please setup your environment following the `Getting Started`
 section before starting the challenge.
 
 ## Getting Started
@@ -22,6 +21,8 @@ $ dotnet watch run
 8. Open your browser
 
 [https://localhost:5001/](https://localhost:5001/)
+
+## Requirements
 
 ## Challenge
 
